@@ -6,7 +6,7 @@ function [] = plot_state(boid,universeLimits,it)
     set(figHandle,'Position',[ss(1) ss(2) ss(3) ss(4)],'Color', ...
     [1 1 1], 'NextPlot','Replace');
 
-    %clf;
+    clf;
     hold on;
     %%
     for i = 1:length(boid)

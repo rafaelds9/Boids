@@ -11,14 +11,22 @@ help main;
 
 %% Parâmetros do universo
 universeLimits = [0 500];
-numIterations = 100;
+numIterations = 500;
+
+% Para ter repetibilidade (comente se for usar no octave)
+rng(2);
+
 
 %% Parâmetros dos boids
 totalBoids = 75;
-initVelocityRange = [0 4];
+
+% Ao adicionar a aceleração posso botar um range mais amplo
+initVelocityRange = [5 10];
 
 % Distâncias para cada regra
-
+dis_repulsion = 50;
+dis_alignment = 180;
+dis_atraction = 220;
 
 
 %% Criação dos boids/Estado inicial dos boids
@@ -39,8 +47,10 @@ end
 plot_state(boid, universeLimits,'0 - Pressione uma tecla no console');
 input('Pressione uma tecla para continuar');
 
-%% Adicionar movimento à eles (update contínuo, drawnow e pá dentro da função)
-for it = 1:2
+%% Atualização dos boids do plot (mexer na aceleração)
+for it = 1:numIterations
+    boid = boid_update(boid, dis_repulsion, dis_alignment,dis_atraction,...
+        universeLimits);
     plot_state(boid, universeLimits,it);
 end
 
