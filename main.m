@@ -1,35 +1,27 @@
-clc; clear all; close all;
-%% Description
-% Algoritmo Boids
+% Algoritmo: Modelo de Boids descrito por Reynolds
 % Disciplina: Inteligência Computacional
 % Professor: Dr. Paulo Henrique da Fonseca Silva
 % Alunos: 
-%   Marcelo 
+%   Marcelo Sousa Gomes
 %   Rafael Duarte de Sousa
 
+clc; clear all; close all;
+
+help main;
 
 %% Parâmetros do universo
 universeLimits = [0 500];
+numIterations = 100;
 
 %% Parâmetros dos boids
 totalBoids = 75;
 initVelocityRange = [0 4];
-% size of the drawing of the boids (based on the universeSize)
-% Originally:
-boidSize = [2.5 1.5];
 
-% According to the universe size
-%boidSize = (max(universeLimits)-min(universeLimits)).*[0.005 0.003];
+% Distâncias para cada regra
 
-%%
 
-ss = get(0, 'ScreenSize');
-Fig1=figure(1);
-set(Fig1,'Position',[ss(1) ss(2) ss(3) ss(4)],'Color',[1 1 1], ...
-    'NextPlot','Replace');
 
 %% Criação dos boids/Estado inicial dos boids
-hold on;
 for i = 1:totalBoids
     boidPosition = universeLimits(1) + floor(rand(1, 2).* ...
         (universeLimits(2) - universeLimits(1)));
@@ -41,25 +33,14 @@ for i = 1:totalBoids
         (initVelocityRange(2)-initVelocityRange(1));
     
     boid(i) = Boid(boidPosition, boidDirection, boidVelocity);
-    
-    pos = boidPosition;
-    
-    x = [boidPosition(1)-boidSize(1) boidPosition(1)+boidSize(1) ...
-        boidPosition(1)-boidSize(1) boidPosition(1)-boidSize(1)];
-    y = [boidPosition(2)-boidSize(2) boidPosition(2) boidPosition(2)+ ...
-        boidSize(2) boidPosition(2)+boidSize(2)];
-    
-    boid_drawing(i) = patch(x,y,'k');
-    %% Ver onde está a rotação
-    angle_rotation_deg = atand(boidDirection(2)/boidDirection(1));
-    rotate(boid_drawing(i),[0 0 1], angle_rotation_deg, [boidPosition(1) boidPosition(2) 0]);
-    
 end
-hold off;
-title('Boids - Iteração inicial')
-xlim(universeLimits);
-ylim(universeLimits);
 
-%% Adicionar movimento à eles
+%% Plotagem do estado inicial
+plot_state(boid, universeLimits,'0 - Pressione uma tecla no console');
+input('Pressione uma tecla para continuar');
 
+%% Adicionar movimento à eles (update contínuo, drawnow e pá dentro da função)
+for it = 1:2
+    plot_state(boid, universeLimits,it);
+end
 
