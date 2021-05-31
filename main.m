@@ -6,25 +6,23 @@
 %   Rafael Duarte de Sousa
 
 clc; clear all; close all;
-
 help main;
 
 %% Parâmetros do universo
 universeLimits = [0 500];
-numIterations = 500;
+numIterations = 4*50;
 
 % Para ter repetibilidade (comente se for usar no octave)
 rng(2);
-
 
 %% Parâmetros dos boids
 totalBoids = 75;
 
 % Ao adicionar a aceleração posso botar um range mais amplo
-initVelocityRange = [5 10];
+initVelocityRange = [2 5];
 
 % Distâncias para cada regra
-dis_repulsion = 50;
+dis_repulsion = 120;
 dis_alignment = 180;
 dis_atraction = 220;
 
@@ -47,7 +45,7 @@ end
 plot_state(boid, universeLimits,'0 - Pressione uma tecla no console');
 input('Pressione uma tecla para continuar');
 
-%% Atualização dos boids do plot (mexer na aceleração)
+%% Atualização dos boids do plot (mexer na aceleração, angulo de visão)
 for it = 1:numIterations
     boid = boid_update(boid, dis_repulsion, dis_alignment,dis_atraction,...
         universeLimits);
