@@ -1,86 +1,92 @@
-function [boid] = boid_update(boid, dis_repulsion, dis_alignment, ...
-    dis_atraction, universeLimits)
+function [boid] = boid_update(boid, radiusZones,forceParam, ...
+    universeLimits, stdDev_dir)
 %BOID_UPDATE Calculates each force involved in the flock's behaviour and
 % sums them in order to find the
 %   Detailed explanation goes here
 
     % Priorities to each behaviour
-    S = 1; % Collision avoidance (other boids)
-    K = 0.5; % Velocity Matching (other boids)
-    M = 0.5; % Flock Centering (other boids)
+    S = forceParam(1);% Collision avoidance (other boids)
+    M = forceParam(2);% Velocity Matching (other boids)
+    K = forceParam(3);% Flock Centering (other boids)
     
-    % Colocar uma variação da velocidade e não da posição (fica mais
-    % fluido)
-
+    repulsionRadius = radiusZones(1);
+    alignRadius = radiusZones(2);
+    cohesionRadius = radiusZones(3);
+    
     % CALCULANDO A NOVA POSIÇÃO E DIREÇÃO PARA CADA BOID
-    for i = 1 : length(boid)
+    for i = 1:length(boid)
         %% CALCULANDO A DISTÂNCIA ENTRE OS BOIDS (i E DEMAIS)
         distance = zeros(length(boid), 1);
-        for j = 1 : length(boid)
+        for j = 1:length(boid)
             distance(j) = norm(boid(i).position - boid(j).position);
         end
         
+        %% OBSTACLE AVOIDANCE ROUTINE
+        
+        
         %% SEPARATION BEHAVIOUR
-        % Identifica todos os boids dentro da distancia de repulsao
-        repulsion_id = find(distance<=dis_repulsion);
-        %quantifica os que devem ser repelidos
-        num_rep = length(repulsion_id);
-        %zera o vetor separação (variação da posição) (pois vai iterar)
-        separacao = [0 0];
-        if num_rep > 0
-            %idem, pois vai iterar
-            position = zeros(1, 2);
-            for j = 1:num_rep
-                % Soma todos os vetores de repulsão
-                position = position + boid(repulsion_id(j)).position;
+        avoidIdx = find(distance>0 & distance<=repulsionRadius);
+        numToAvoid = length(avoidIdx);
+        sepForce = zeros(1, 2);
+        if numToAvoid > 0
+            sumRepel = zeros(1, 2);
+            rij = zeros(1,2);
+            for j = 1:numToAvoid
+                rij = (boid(avoidIdx(j)).position - boid(i).position);
+                sumRepel = sumRepel + rij/norm(rij);
             end
-            position = round(position ./ num_rep);
-            separacao = boid(i).position - position;  
+            sepForce = -sumRepel./norm(sumRepel);
         end
 
         %% ALIGNMENT BEHAVIOUR
-        alignment_id = find(distance<=dis_alignment);
-        num_agm = length(alignment_id);
-        temp_direction = 0;
-        alinhamento = [0 0];
-        if num_agm > 0
-            boid(i).direction = zeros(1, 2);
-            for j = 1 : num_agm
-                temp_direction = temp_direction + boid(alignment_id(j)).direction;
+        alignIdx = find(distance>repulsionRadius & distance<=alignRadius);
+        numToAlign = length(alignIdx);
+        alignForce = zeros(1, 2);
+        if ((numToAlign > 0) && (numToAvoid == 0))
+            sumAlignDirections = zeros(1, 2);
+            for j = 1:numToAlign
+                sumAlignDirections = sumAlignDirections + ...
+                    boid(alignIdx(j)).direction;
             end
-           alinhamento = boid(i).direction + temp_direction/norm(temp_direction);
+           alignForce = sumAlignDirections./norm(sumAlignDirections);
         end
 
-        %% COHESION BEHAVIOUR
-        attraction_id = find(distance<=dis_atraction);
-        num_att = length(attraction_id);
-        coesao = [0 0];
-        if num_att > 0
-            position = zeros(1, 2);
-            for j = 1 : num_att
-                position = position + boid(attraction_id(j)).position;
+        %% COHESION/ATTRACTION BEHAVIOUR
+        attractionIdx = find(distance>alignRadius & distance<= ...
+            cohesionRadius);
+        numAttractors = length(attractionIdx);
+        cohesionForce = zeros(1, 2);
+        if ((numAttractors > 0) && (numToAvoid == 0))
+            sumAttract = zeros(1, 2);
+            rij = zeros(1,2);
+            for j = 1:numAttractors
+                rij = (boid(attractionIdx(j)).direction - ...
+                boid(i).direction);
+                sumAttract = sumAttract + rij/norm(rij);
             end
-            position = round(position ./ num_att);
-            boid(i).direction =  boid(i).direction + position - boid(i).position;
-            coesao = boid(i).direction / norm(boid(i).direction);
+            cohesionForce = sumAttract./norm(sumAttract);
         end
         
-        %% Summing the forces
-        %acceleration = 
+        %% Summing the forces with the direction
         
-        % Entender
-        vet_direction = [10 5]; %VETOR DE DIREÇÃO
+        % This is done differently than Couzin to consider the previous
+        % boid direction
+        boid(i).direction = boid(i).direction + S*sepForce +  ...
+            M*alignForce + K*cohesionForce + stdDev_dir*randn(1,2);
         
-        %%
-        % CALCULO DA DIREÇÃO RESULTANTE
-        boid(i).direction = boid(i).direction + S*separacao + M*alinhamento + K*coesao + vet_direction;
-        boid(i).direction = boid(i).direction / norm(boid(i).direction);
-        
-        % CALCULO DA POSIÇÃO RESULTANTE E ADICIONANDO MOVIMENTO 
-        boid(i).position = round(boid(i).position + boid(i).direction .* boid(i).velocity);
+        % Normalizing the direction
+        boid(i).direction = boid(i).direction/norm(boid(i).direction);
+            
+        % Not considering the previous direction
+        %boid(i).direction =  S*sepForce + M*alignForce + ...
+        %    K*cohesionForce + stdDev_dir*randn(1,2);
+
+        boid(i).position=boid(i).position + boid(i).direction.* ...
+            boid(i).velocity;
         
         % DEFININDO A POSIÇÃO DE BOIDS DENTRO DA FAIXA
-        boid(i).position = mod(boid(i).position + universeLimits(2), universeLimits(2)); 
+        boid(i).position = mod(boid(i).position + universeLimits(2), ... 
+            universeLimits(2)); 
     end
 
 end

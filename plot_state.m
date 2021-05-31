@@ -1,6 +1,5 @@
-function [] = plot_state(boid,universeLimits,it)
+function [] = plot_state(boid,universeLimits,boidSize,it)
     
-    boidSize = [2.5 1.5];
     ss = get(0, 'ScreenSize');
     figHandle=figure(1);
     set(figHandle,'Position',[ss(1) ss(2) ss(3) ss(4)],'Color', ...

@@ -1,6 +1,6 @@
 classdef Boid
     % Defines the Boid class containing the attributes "position", 
-    % "direction" and "velocity" and its methods
+    % "direction" and its methods
     properties
     	position %s
         direction %dir
