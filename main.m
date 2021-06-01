@@ -8,13 +8,13 @@
 clc; clear all; close all;
 help main;
 
-%% Universe parameters
-universeLimits = [0 100];
-numIterations = 500;
-
 %% Randomness
 % rng for reproducibility (comente se for usar no octave)
 rng(2);
+
+%% Universe parameters
+universeLimits = [0 100];
+numIterations = 500;
 
 %% Boids parameters
 totalBoids = 50;
@@ -36,13 +36,13 @@ forceParam = [1 1 1]; %S, M, K
 
 %% Obstacle parameters
 obstacle = struct('position', {});
-numObstacles = 5;
+numObstacles = 15;
 
 % Size of the obstacle
 obstSize = 5;
 
 % Minimal distance between a boid and an obstacle
-obstRadius = obstSize + 5;
+obstRadius = obstSize*sqrt(2)+2;
 
 %% Boids creation/Initial State
 for i = 1:totalBoids
@@ -64,10 +64,27 @@ end
 
 
 %% Obstacle Creations/Initial State (Optimize more)
-for i=1:numObstacles
-    obstacle(i).position = universeLimits(1) + obstSize + ...
-            floor(rand(1, 2).*(universeLimits(2) - obstSize - ...
-            universeLimits(1)));
+
+% Adicionar agora algo pra evitar a sobreposição entre obstáculos
+i=1;
+while i<= numObstacles
+    if i==1
+        obstacle(i).position = (universeLimits(1) + 0.5*obstSize) + ...
+            floor(rand(1, 2).*((universeLimits(2) - 0.5*obstSize) - ...
+            (universeLimits(1) + 0.5*obstSize)));
+    else
+        obstacle(i).position = (universeLimits(1)+ 0.5*obstSize) + ...
+            floor(rand(1, 2).*((universeLimits(2)- 0.5*obstSize) - ...
+            (universeLimits(1) + 0.5*obstSize)));
+        for j = 1:i
+            distanceObst(j) = norm(obstacle(i).position - ...
+                obstacle(j).position);
+        end
+        if(~isempty(find(distanceObst>0 & distanceObst<=obstRadius)))
+          continue;
+        end
+    end
+    i = i + 1;
 end
 
 %% Plotting the initial state
