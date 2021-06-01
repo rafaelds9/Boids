@@ -1,20 +1,22 @@
-% Algoritmo: Modelo de Boids descrito por Reynolds
+% Algoritmo: Modelo de Boids descrito por Reynolds (com adição de
+% obstáculos)
 % Disciplina: Inteligência Computacional
 % Professor: Dr. Paulo Henrique da Fonseca Silva
 % Alunos: 
 %   Marcelo Sousa Gomes
 %   Rafael Duarte de Sousa
-
+%
+% ====================================================================
 clc; clear all; close all;
 help main;
-
-%% Universe parameters
-universeLimits = [0 100];
-numIterations = 500;
 
 %% Randomness
 % rng for reproducibility (comente se for usar no octave)
 rng(2);
+
+%% Universe parameters
+universeLimits = [0 100];
+numIterations = 500;
 
 %% Boids parameters
 totalBoids = 50;
@@ -35,8 +37,14 @@ forceParam = [1 1 1]; %S, M, K
 % K = Flock Centering --> Cohesion (other boids)
 
 %% Obstacle parameters
+obstacle = struct('position', {});
+numObstacles = 15;
 
+% Size of the obstacle
+obstSize = 5;
 
+% Minimal distance between a boid and an obstacle
+obstRadius = obstSize*sqrt(2)+2;
 
 %% Boids creation/Initial State
 for i = 1:totalBoids
@@ -56,16 +64,39 @@ for i = 1:totalBoids
     boid(i) = Boid(boidPosition, boidDirection, boidVelocity);
 end
 
+
+%% Obstacle Creations/Initial State
+i=1;
+while i<= numObstacles
+    if i==1
+        obstacle(i).position = (universeLimits(1) + 0.5*obstSize) + ...
+            floor(rand(1, 2).*((universeLimits(2) - 0.5*obstSize) - ...
+            (universeLimits(1) + 0.5*obstSize)));
+    else
+        obstacle(i).position = (universeLimits(1)+ 0.5*obstSize) + ...
+            floor(rand(1, 2).*((universeLimits(2)- 0.5*obstSize) - ...
+            (universeLimits(1) + 0.5*obstSize)));
+        for j = 1:i
+            distanceObst(j) = norm(obstacle(i).position - ...
+                obstacle(j).position);
+        end
+        if(~isempty(find(distanceObst>0 & distanceObst<=obstRadius)))
+          continue;
+        end
+    end
+    i = i + 1;
+end
+
 %% Plotting the initial state
 % Prompts the user to press a key in order to show further iterations
-plot_state(boid, universeLimits, boidSize, ...
-    '0 - Pressione uma tecla no console');
+plot_state(boid, obstacle, universeLimits, boidSize, obstSize, ...
+    '0 - Pressione uma tecla no console para continuar');
 input('Pressione uma tecla para continuar');
 
 %% Boids and plot update
 for it = 1:numIterations
-    boid = boid_update(boid, radiusZones, forceParam,...
+    boid = boid_update(boid, obstacle, obstRadius,radiusZones,forceParam,...
         universeLimits, stdDev_dir);
-    plot_state(boid, universeLimits, boidSize,it);
+    plot_state(boid, obstacle, universeLimits, boidSize,obstSize,it);
 end
 
