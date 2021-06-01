@@ -1,5 +1,5 @@
-function [boid] = boid_update(boid, radiusZones,forceParam, ...
-    universeLimits, stdDev_dir)
+function [boid] = boid_update(boid, obstacle, obstRadius, radiusZones, ...
+    forceParam, universeLimits, stdDev_dir)
 %BOID_UPDATE Calculates each force involved in the flock's behaviour and
 % sums them in order to find the
 %   Detailed explanation goes here
@@ -15,20 +15,37 @@ function [boid] = boid_update(boid, radiusZones,forceParam, ...
     
     % for loop to calculate the new position and direction for each boid
     for i = 1:length(boid)
-        %% CALCULATING THE DISTANCE BETWEEN THE BOID (i and the others)
+        %% CALCULATING THE DISTANCE BETWEEN THE BOID i and the obstacles
+        distanceObst = zeros(length(obstacle), 1);
+        for j = 1:length(obstacle)
+            distanceObst(j) = norm(boid(i).position - obstacle(j).position);
+        end
+        
+        %% OBSTACLE AVOIDANCE ROUTINE (PRIORITY)
+        avoidObstIdx = find(distanceObst>0 & distanceObst<=obstRadius);
+        numToAvoidObst = length(avoidObstIdx);
+        sepForceObst = zeros(1, 2);
+        if numToAvoidObst > 0
+            sumRepelObst = zeros(1, 2);
+            rij = zeros(1,2);
+            for j = 1:numToAvoidObst
+                rij = (obstacle(avoidObstIdx(j)).position - ...
+                    boid(i).position);
+                sumRepelObst = sumRepelObst + rij/norm(rij);
+            end
+            sepForceObst = -sumRepelObst./norm(sumRepelObst);
+        end
+        
+        %% CALCULATING THE DISTANCE BETWEEN THE BOID i and the other boids
         distance = zeros(length(boid), 1);
         for j = 1:length(boid)
             distance(j) = norm(boid(i).position - boid(j).position);
         end
-        
-        %% OBSTACLE AVOIDANCE ROUTINE
-        
-        
         %% SEPARATION BEHAVIOUR
         avoidIdx = find(distance>0 & distance<=repulsionRadius);
         numToAvoid = length(avoidIdx);
         sepForce = zeros(1, 2);
-        if numToAvoid > 0
+        if numToAvoid > 0 && numToAvoidObst == 0
             sumRepel = zeros(1, 2);
             rij = zeros(1,2);
             for j = 1:numToAvoid
@@ -42,7 +59,7 @@ function [boid] = boid_update(boid, radiusZones,forceParam, ...
         alignIdx = find(distance>repulsionRadius & distance<=alignRadius);
         numToAlign = length(alignIdx);
         alignForce = zeros(1, 2);
-        if ((numToAlign > 0) && (numToAvoid == 0))
+        if ((numToAlign > 0) && (numToAvoid == 0) && (numToAvoidObst == 0))
             sumAlignDirections = zeros(1, 2);
             for j = 1:numToAlign
                 sumAlignDirections = sumAlignDirections + ...
@@ -56,7 +73,7 @@ function [boid] = boid_update(boid, radiusZones,forceParam, ...
             cohesionRadius);
         numAttractors = length(attractionIdx);
         cohesionForce = zeros(1, 2);
-        if ((numAttractors > 0) && (numToAvoid == 0))
+        if ((numAttractors > 0)&&(numToAvoid == 0)&&(numToAvoidObst == 0))
             sumAttract = zeros(1, 2);
             rij = zeros(1,2);
             for j = 1:numAttractors
@@ -71,7 +88,7 @@ function [boid] = boid_update(boid, radiusZones,forceParam, ...
         
         % This is done differently than Couzin to consider the previous
         % boid direction
-        boid(i).direction = boid(i).direction + S*sepForce +  ...
+        boid(i).direction = boid(i).direction+sepForceObst+S*sepForce + ...
             M*alignForce + K*cohesionForce + stdDev_dir*randn(1,2);
         
         % Normalizing the direction
