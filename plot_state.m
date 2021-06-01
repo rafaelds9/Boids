@@ -38,8 +38,8 @@ function [] = plot_state(boid, obstacle, universeLimits, boidSize, ...
             [.49 1 .63], 'EdgeColor', 'k')
     end
     
-    strTitle = "Boids - Iteration nº " + it;
-    title(strTitle);
+    strTitle = "Boids - Iteration n. " + it;
+    title(strTitle, 'FontSize', 16);
     
     xlim(universeLimits);
     ylim(universeLimits);

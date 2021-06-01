@@ -1,10 +1,12 @@
-% Algoritmo: Modelo de Boids descrito por Reynolds
+% Algoritmo: Modelo de Boids descrito por Reynolds (com adição de
+% obstáculos)
 % Disciplina: Inteligência Computacional
 % Professor: Dr. Paulo Henrique da Fonseca Silva
 % Alunos: 
 %   Marcelo Sousa Gomes
 %   Rafael Duarte de Sousa
-
+%
+% ====================================================================
 clc; clear all; close all;
 help main;
 
@@ -63,9 +65,7 @@ for i = 1:totalBoids
 end
 
 
-%% Obstacle Creations/Initial State (Optimize more)
-
-% Adicionar agora algo pra evitar a sobreposição entre obstáculos
+%% Obstacle Creations/Initial State
 i=1;
 while i<= numObstacles
     if i==1
@@ -90,7 +90,7 @@ end
 %% Plotting the initial state
 % Prompts the user to press a key in order to show further iterations
 plot_state(boid, obstacle, universeLimits, boidSize, obstSize, ...
-    '0 - Pressione uma tecla no console');
+    '0 - Pressione uma tecla no console para continuar');
 input('Pressione uma tecla para continuar');
 
 %% Boids and plot update
