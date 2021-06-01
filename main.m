@@ -35,8 +35,14 @@ forceParam = [1 1 1]; %S, M, K
 % K = Flock Centering --> Cohesion (other boids)
 
 %% Obstacle parameters
+obstacle = struct('position', {});
+numObstacles = 5;
 
+% Size of the obstacle
+obstSize = 5;
 
+% Minimal distance between a boid and an obstacle
+obstRadius = obstSize + 5;
 
 %% Boids creation/Initial State
 for i = 1:totalBoids
@@ -56,16 +62,24 @@ for i = 1:totalBoids
     boid(i) = Boid(boidPosition, boidDirection, boidVelocity);
 end
 
+
+%% Obstacle Creations/Initial State (Optimize more)
+for i=1:numObstacles
+    obstacle(i).position = universeLimits(1) + obstSize + ...
+            floor(rand(1, 2).*(universeLimits(2) - obstSize - ...
+            universeLimits(1)));
+end
+
 %% Plotting the initial state
 % Prompts the user to press a key in order to show further iterations
-plot_state(boid, universeLimits, boidSize, ...
+plot_state(boid, obstacle, universeLimits, boidSize, obstSize, ...
     '0 - Pressione uma tecla no console');
 input('Pressione uma tecla para continuar');
 
 %% Boids and plot update
 for it = 1:numIterations
-    boid = boid_update(boid, radiusZones, forceParam,...
+    boid = boid_update(boid, obstacle, obstRadius,radiusZones,forceParam,...
         universeLimits, stdDev_dir);
-    plot_state(boid, universeLimits, boidSize,it);
+    plot_state(boid, obstacle, universeLimits, boidSize,obstSize,it);
 end
 

@@ -1,9 +1,10 @@
-function [] = plot_state(boid,universeLimits,boidSize,it)
+function [] = plot_state(boid, obstacle, universeLimits, boidSize, ...
+    obstSize, it)
     
     ss = get(0, 'ScreenSize');
     figHandle=figure(1);
-    set(figHandle,'Position',[ss(1) ss(2) ss(3) ss(4)],'Color', ...
-    [1 1 1], 'NextPlot','Replace');
+    set(figHandle,'Position',[ss(1) ss(2) 0.9*ss(4) 0.9*ss(4)], ...
+        'Color', [1 1 1], 'NextPlot','Replace');
 
     clf;
     grid minor;
@@ -26,6 +27,15 @@ function [] = plot_state(boid,universeLimits,boidSize,it)
         rotate(boid_drawing(i),[0 0 1], angle_rotation_deg, ...
             [boid(i).position(1) boid(i).position(2) 0]);
 
+    end
+    
+    for i = 1:length(obstacle)
+        x = obstacle(i).position(1);
+        y = obstacle(i).position(2);
+        %plot(x, y,'s','LineWidth',2,'MarkerEdgeColor','k', ...
+        %    'MarkerFaceColor',[.49 1 .63],'MarkerSize', 4*obstSize );
+        rectangle('Position', [x y obstSize obstSize], 'FaceColor', ...
+            [.49 1 .63], 'EdgeColor', 'k')
     end
     
     strTitle = "Boids - Iteration nº " + it;
