@@ -6,6 +6,7 @@ function [] = plot_state(boid,universeLimits,boidSize,it)
     [1 1 1], 'NextPlot','Replace');
 
     clf;
+    grid minor;
     hold on;
     %%
     for i = 1:length(boid)
@@ -24,15 +25,14 @@ function [] = plot_state(boid,universeLimits,boidSize,it)
         
         rotate(boid_drawing(i),[0 0 1], angle_rotation_deg, ...
             [boid(i).position(1) boid(i).position(2) 0]);
+
     end
-    
     
     strTitle = "Boids - Iteration nº " + it;
     title(strTitle);
     
     xlim(universeLimits);
     ylim(universeLimits);
-    
     hold off;
 end
 

@@ -8,25 +8,23 @@
 clc; clear all; close all;
 help main;
 
-%% Parâmetros do universo
-universeLimits = [0 300];
-numIterations = 5000;
+%% Universe parameters
+universeLimits = [0 100];
+numIterations = 500;
 
-%% Aleatoriedades 
-% rng abaixo para ter repetibilidade (comente se for usar no octave)
+%% Randomness
+% rng for reproducibility (comente se for usar no octave)
 rng(2);
 
-%% Parâmetros dos boids
-totalBoids = 20;
-
-boidSize = [2.5 1.5]; %Used in the plots
-
+%% Boids parameters
+totalBoids = 50;
+boidSize = 0.25.*[2.5 1.5]; %Used in the plots
 boidVelocity = 1;
 
 % Standard Deviance of random direction changes (based on Couzin)
-stdDev_dir = 0.05;
+stdDev_dir = 0.1;
 
-radiusZones = [8 9 10]; %Rs, Ra, Rc
+radiusZones = [2 10 15]; %Rs, Ra, Rc
 % Rs = Max Radius Separation Zone
 % Ra = Max Radius Alignment Zone
 % Rc = Max Radius Cohesion Zone
@@ -36,11 +34,11 @@ forceParam = [1 1 1]; %S, M, K
 % M = Velocity Matching --> Alignment (other boids)
 % K = Flock Centering --> Cohesion (other boids)
 
-%% Parâmetros dos obstáculos
+%% Obstacle parameters
 
 
 
-%% Criação dos boids/Estado inicial dos boids
+%% Boids creation/Initial State
 for i = 1:totalBoids
     
     % Uniform distribution
@@ -49,8 +47,8 @@ for i = 1:totalBoids
     
     %Normal distribution:
         %: mean = universeLimits(2)/2
-        %: stdev = universeLimits(2)/2 .* 0.5
-    %boidPosition = (universeLimits(2)/2)*(1 + randn(1,2).*0.5);
+        %: stdev = universeLimits(2)/2 .* 0.25
+    %boidPosition = (universeLimits(2)/2)*(1 + randn(1,2).*0.25);
     
     boid_temp_dir = rand(1, 2);
     boidDirection = boid_temp_dir/norm(boid_temp_dir);
@@ -58,12 +56,13 @@ for i = 1:totalBoids
     boid(i) = Boid(boidPosition, boidDirection, boidVelocity);
 end
 
-%% Plotagem do estado inicial
+%% Plotting the initial state
+% Prompts the user to press a key in order to show further iterations
 plot_state(boid, universeLimits, boidSize, ...
     '0 - Pressione uma tecla no console');
 input('Pressione uma tecla para continuar');
 
-%% Atualização dos boids do plot (mexer na aceleração, angulo de visão)
+%% Boids and plot update
 for it = 1:numIterations
     boid = boid_update(boid, radiusZones, forceParam,...
         universeLimits, stdDev_dir);

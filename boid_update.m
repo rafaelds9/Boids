@@ -13,9 +13,9 @@ function [boid] = boid_update(boid, radiusZones,forceParam, ...
     alignRadius = radiusZones(2);
     cohesionRadius = radiusZones(3);
     
-    % CALCULANDO A NOVA POSIÇÃO E DIREÇÃO PARA CADA BOID
+    % for loop to calculate the new position and direction for each boid
     for i = 1:length(boid)
-        %% CALCULANDO A DISTÂNCIA ENTRE OS BOIDS (i E DEMAIS)
+        %% CALCULATING THE DISTANCE BETWEEN THE BOID (i and the others)
         distance = zeros(length(boid), 1);
         for j = 1:length(boid)
             distance(j) = norm(boid(i).position - boid(j).position);
@@ -84,7 +84,7 @@ function [boid] = boid_update(boid, radiusZones,forceParam, ...
         boid(i).position=boid(i).position + boid(i).direction.* ...
             boid(i).velocity;
         
-        % DEFININDO A POSIÇÃO DE BOIDS DENTRO DA FAIXA
+        % ROI frontier treatment
         boid(i).position = mod(boid(i).position + universeLimits(2), ... 
             universeLimits(2)); 
     end
