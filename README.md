@@ -1,6 +1,4 @@
 # Boids
- 
-# Boids
 
 Project developed by Marcelo Sousa Gomes and Rafael Duarte de Sousa in June 2021 as a homework for the course of Computational Intelligence, part of the  electrical engineering academic master's program.
 
