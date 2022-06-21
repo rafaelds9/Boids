@@ -4,7 +4,7 @@ Project developed by Marcelo Sousa Gomes and Rafael Duarte de Sousa in June 2021
 
 ## Description
 
-This project is based on the algorithm described by Craig W. Reynolds in *Flocks, Herds, and Schools: A Distributed Behavioral Model* (1987). Each Boid is a particle that has a position, a direction of movement and a velocity that is updated in every iteration of the simulation based on separation, cohesion and alignment forces.
+This project is based on the algorithm described by Craig W. Reynolds in *Flocks, Herds, and Schools: A Distributed Behavioral Model* (1987) [[1]](#1). Each Boid is a particle that has a position, a direction of movement and a velocity that is updated in every iteration of the simulation based on separation, cohesion and alignment forces.
 
 Considering the separation radius as *Rs*, the alignment radius as *Ra* and the cohesion radius as *Rc* and *Rs*<*Ra*<*Rc*:
 
@@ -12,7 +12,7 @@ Considering the separation radius as *Rs*, the alignment radius as *Ra* and the 
 * The alignment force is the force that is applied to the boid so its direction will be the average direction of the boids that are in a distance between *Rs* and *Ra* (*Rs*<distance*Ra*).
 * The cohesion force is the force that is applied to the boid so it will move to the centroid defined by the boids in the radius *Rc*.
 
-This model also has adaptations proposed by Couzin *et al* in *Collective Memory and Spatial Sorting in Animal Groups* (2002) that prioritize the separation force in a boid when its distance from another boid is less than the separation radius. In this condition, the separation force is the only force that acts on the boid.
+This model also has adaptations proposed by Couzin *et al* in *Collective Memory and Spatial Sorting in Animal Groups* (2002) [[2]](#2) that prioritize the separation force in a boid when its distance from another boid is less than the separation radius. In this condition, the separation force is the only force that acts on the boid.
 
 If *Rs*<*Ra*<*Rc*, the boids tend to group as shown below:
 
